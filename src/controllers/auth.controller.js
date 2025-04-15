@@ -1,6 +1,9 @@
 import { status } from "http-status";
+import bcrypt from "bcrypt";
 
 import { User } from "../models/index.js";
+import { generateToken } from "../utils/generateToken.js";
+import { config } from "../config/index.js";
 
 export const authController = {
   signUp: async (req, res, next) => {
@@ -8,12 +11,17 @@ export const authController = {
       const body = req.body;
       const user = await User.findOne(
         { email: body.email },
-        "email _id",
+        "email _id"
       ).exec();
 
       console.log(user);
       if (!user) {
-        const newUser = new User(body);
+        const { password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = new User({
+          ...req.body,
+          password: hashedPassword,
+        });
 
         await newUser.save();
         res.send(newUser);
@@ -35,8 +43,8 @@ export const authController = {
         res.send("User not found!");
         return;
       }
-
-      const validaPass = await user.isValidPassword(body.password);
+      const { email, password } = req.body;
+      const validaPass = await user.isValidPassword(password, user);
 
       console.log({ validaPass });
       if (!validaPass) {
@@ -44,9 +52,24 @@ export const authController = {
         return;
       }
 
+      const payload = {
+        id: user._id,
+        email: user.email,
+      };
+      const jwtSecret = config.secret;
+      const token = await generateToken(payload, jwtSecret, {
+        algorithm: "HS512",
+        expiresIn: "1d",
+      });
+
       res.send({
         message: "ok",
-        data: user,
+        data: {
+          user: {
+            ...payload,
+          },
+          jwt: token,
+        },
       });
     } catch (err) {
       next(err);

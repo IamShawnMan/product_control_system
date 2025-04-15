@@ -2,10 +2,11 @@ import express from "express";
 import morgan from "morgan";
 
 import { User } from "./models/index.js";
-import {
-  customMiddelware,
-  newMiddeleware,
-} from "./middlewares/custom.middleware.js";
+// import {
+//   customMiddelware,
+//   newMiddeleware,
+// } from "./middlewares/custom.middleware.js";
+import { errorMiddleware } from "./middlewares/error.middleware.js";
 import { roleGuard } from "./middlewares/guard.middleware.js";
 import { appRouter } from "./routes/index.js";
 const app = express();
@@ -21,10 +22,10 @@ app.use("/api/v1", appRouter);
 //   "/",
 //   // roleGuard("user", "admin", "superadmin"),
 //   newMiddeleware,
-//   customMiddelware,
+//   customMiddelware
 //   // customController.findAll,
 // );
 
-// app.use(ErrorMiddleware);
+app.use(errorMiddleware);
 
 export default app;

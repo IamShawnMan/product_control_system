@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import { collections } from "../common/constants/db.js";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
-    full_name: {
+    fullName: {
       type: String,
       trim: true,
       lower: true,
@@ -25,7 +26,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 userSchema.pre("save", async function (next) {
@@ -42,9 +43,10 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-userSchema.methods.isValidPassword = async function (password) {
+userSchema.methods.isValidPassword = async function (password, user) {
   try {
-    return password === this.password;
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    return isValidPassword;
   } catch (error) {
     throw new Error("Password comparison failed");
   }
