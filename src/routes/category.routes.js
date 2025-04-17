@@ -2,7 +2,7 @@ import { Router } from "express";
 import { categoryController } from "../controllers/index.js";
 import { validateBody } from "../middlewares/validation.middleware.js";
 import { categorySchema } from "../validations/index.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { authMiddleware } from "../middlewares/exapleAuthMiddleware.js";
 
 export const categoryRouter = Router();
 

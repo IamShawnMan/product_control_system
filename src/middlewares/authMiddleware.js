@@ -7,8 +7,6 @@ const jwtSecret = config.secret;
 export const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  console.log(authHeader, "AAAAAAAAAAAAa");
-
   if (!authHeader) {
     return next(new AppError("Login first to continue", 401));
   }
